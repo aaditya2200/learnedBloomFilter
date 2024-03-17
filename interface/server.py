@@ -1,5 +1,9 @@
 """
-This file maps the learned bloom filter APIs to REST API endpoints
+@author Aaditya
+@version 0.1
+@since 17-03-2024
+This file maps the learned bloom filter APIs to REST API endpoints.
+USE IN REST MODE ONLY
 """
 from flask import Flask, request, jsonify
 from api import LearnedBloomFilter
