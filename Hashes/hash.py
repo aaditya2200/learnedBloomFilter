@@ -1,5 +1,9 @@
 """
-This file contains all hash functions
+@author Aaditya
+@version 0.1
+@since 17-03-2024
+This file contains all hash functions. Any new hash functions to be added to this class.
+INTERNAL USE ONLY
 """
 
 

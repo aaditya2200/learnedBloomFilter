@@ -1,6 +1,10 @@
 """
+@author Aaditya
+@version 0.1
+@since 17-03-2024
 This file contains the public API for the learned bloom filter. It can be used standalone or as part of the
 larger test module.
+FOR EXTERNAL USE
 """
 from confluent_kafka import KafkaError
 
@@ -8,8 +12,9 @@ from Filter import BloomFilter
 from enum import Enum
 import json
 
+
 class MODE(Enum):
-    DEBUG = 0
+    REST = 0
     STREAM = 1
 
 
@@ -50,14 +55,20 @@ class LearnedBloomFilter:
             # TODO call to DB for insert
 
     """
-    Only to be used in DEBUG
+    Only to be used in REST mode
     """
+
     def insert(self, key):
+        if self.mode != MODE.REST:
+            raise ValueError("Invalid mode. Expected MODE.REST.")
         self.filter.insert(key)
         return
 
     """
-    Only to be used in DEBUG
+    Only to be used in REST mode
     """
+
     def query(self, key):
+        if self.mode != MODE.REST:
+            raise ValueError("Invalid mode. Expected MODE.REST.")
         return self.filter.query(key)

@@ -1,3 +1,9 @@
+"""
+@author Aaditya
+@version 0.1
+@since 17-03-2024
+Bloom filter internal code. DO NOT USE DIRECTLY. CONSUME ONLY VIA api.py
+"""
 from array import array
 import math
 import tensorflow as tf
@@ -7,6 +13,7 @@ import numpy as np
 from Hashes import hash
 from kafka import KafkaConsumer
 from confluent_kafka import Consumer, KafkaError
+from Brain import brain
 
 
 def integer_to_binary(id):
@@ -22,48 +29,8 @@ class BloomFilter:
         self.number_of_bits = int(-1 * (num_entries * math.log(false_pos_rate)) / pow(math.log(2.0), 2))
         self.hash_func_list = hash_func_list
         self.bloom = array('i', [0] * self.number_of_bits)
-        # self.model = tf.keras.Sequential([
-        #     tf.keras.layers.Dense(64, activation='relu', input_shape=(64,)),
-        #     tf.keras.layers.Dense(32, activation='relu'),
-        #     tf.keras.layers.Dense(units=16, activation='relu'),
-        #     tf.keras.layers.Dense(1, activation='sigmoid')
-        # ])
-        input_size = 64  # Assuming 64-bit input representation
-        embedding_size = 32  # Embedding size for input bits
-        conv_layers = [[64, 4, 2], [32, 3, 2]]  # Convolutional layers: [filters, kernel_size, pooling_size]
-        fully_connected_layers = [32, 1]  # Fully connected layers
-        dropout_p = 0.5  # Dropout probability
-        optimizer = 'adam'
-        loss = 'binary_crossentropy'
+        self.brain = brain.Brain()
 
-        # Define the input layer
-        inputs = Input(shape=(input_size,), name='input', dtype='int64')
-
-        # Embedding layer
-        embedding_layer = Embedding(input_dim=2, output_dim=embedding_size, input_length=input_size)
-        embedded_inputs = embedding_layer(inputs)
-
-        # Convolutional layers
-        x = embedded_inputs
-        for filters, kernel_size, pooling_size in conv_layers:
-            x = Conv1D(filters=filters, kernel_size=kernel_size, activation='relu')(x)
-            x = MaxPooling1D(pool_size=pooling_size)(x)
-
-        # Flatten the output
-        x = Flatten()(x)
-
-        # Fully connected layers
-        for units in fully_connected_layers:
-            x = Dense(units, activation='relu')(x)
-            x = Dropout(dropout_p)(x)
-
-        # Output layer
-        predictions = Dense(1, activation='sigmoid')(x)
-
-        # Build the model
-        self.model = Model(inputs=inputs, outputs=predictions)
-        self.model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
     def insert(self, key):
         for func in self.hash_func_list:
@@ -72,12 +39,12 @@ class BloomFilter:
         # Now, lets train our model also.
 
         X_train, y_train = np.array([integer_to_binary(key)]), np.array([[1]])
-        self.model.train_on_batch(X_train, y_train)
+        self.brain.train_batch(X_train, y_train)
 
     def train(self, nums):
         for item in nums:
-            X_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
-            self.model.train_on_batch(X_train, y_train)
+            x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
+            self.brain.train_batch(x_train, y_train)
 
     def query(self, key):
         for func in self.hash_func_list:
@@ -87,7 +54,7 @@ class BloomFilter:
         return True
 
     def query_nn(self, key):
-        prediction = self.model.predict(np.array([integer_to_binary(key)]))
+        prediction = self.brain.get_prediction(np.array([integer_to_binary(key)]))
         if prediction > 0.9:
             return True
         else:
