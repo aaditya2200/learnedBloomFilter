@@ -4,6 +4,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
 import numpy as np
+from Hashes import hash
+from kafka import KafkaConsumer
+from confluent_kafka import Consumer, KafkaError
 
 
 def integer_to_binary(id):
@@ -12,6 +15,7 @@ def integer_to_binary(id):
 
 class BloomFilter:
     def __init__(self, num_hash_functions, num_entries, false_pos_rate, hash_func_list):
+        self.kafka_cfg = None
         self.num_hash_functions = num_hash_functions
         self.num_entries = num_entries
         self.false_pos_rate = false_pos_rate
@@ -88,3 +92,20 @@ class BloomFilter:
             return True
         else:
             return self.query(key)
+
+
+def create_filter_with_defaults():
+    bf = BloomFilter(4, 1000, 0.1, hash.Hash().get_default_hash_spec())
+    return bf
+
+
+def create_filter_with_stream_config(bf, optargs):
+    bootstrap_server_name = optargs[0]
+    topic_name = optargs[1]
+    consumer = KafkaConsumer(topic_name, bootstrap_servers=[bootstrap_server_name])
+    bf.kafka_cfg = {
+        'bootstrap.servers': bootstrap_server_name,
+        'auto.offset.reset': 'earliest'
+    }
+    consumer = Consumer(bf.kafka_cfg)
+    return consumer
