@@ -6,7 +6,7 @@ This file maps the learned bloom filter APIs to REST API endpoints.
 USE IN REST MODE ONLY
 """
 from flask import Flask, request, jsonify
-from api import LearnedBloomFilter
+from api import LearnedBloomFilter, MODE
 
 app = Flask(__name__)
 
@@ -32,10 +32,12 @@ def query(key):
     }
     return jsonify(json_result), 200
 
+
 @app.route("/consume")
 def consume():
-    lbf
+    lbf.consume()
+
 
 if __name__ == "__main__":
-    lbf = LearnedBloomFilter()
+    lbf = LearnedBloomFilter(MODE.STREAM, ['localhost:9092', 'stream-test'])
     app.run(debug=True)

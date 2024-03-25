@@ -72,7 +72,8 @@ def create_filter_with_stream_config(bf, optargs):
     consumer = KafkaConsumer(topic_name, bootstrap_servers=[bootstrap_server_name])
     bf.kafka_cfg = {
         'bootstrap.servers': bootstrap_server_name,
-        'auto.offset.reset': 'earliest'
+        'auto.offset.reset': 'earliest',
+        'group.id': 'test'
     }
     consumer = Consumer(bf.kafka_cfg)
     return consumer

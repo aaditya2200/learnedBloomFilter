@@ -7,7 +7,10 @@ from keras.src.layers import Dense
 
 class Brain:
 
-    def __init__(self, input_size, embedding_size, conv_layers, fully_connected_layers, dropout_p, optimizer, loss):
+    """
+    Args to be added input_size, embedding_size, conv_layers, fully_connected_layers, dropout_p, optimizer, loss
+    """
+    def __init__(self):
         self.neural_network = model = Sequential([
             Dense(64, activation='relu', input_shape=(64,), name='input_layer'),
             Dense(32, activation='relu', name='hidden_layer'),
