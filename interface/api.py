@@ -36,7 +36,7 @@ class LearnedBloomFilter:
         return
 
     def consume(self):
-        self.consumer.subscribe(self.optargs[1])
+        self.consumer.subscribe([self.optargs[1]])
         while True:
             msg = self.consumer.poll(1.0)
             if msg is None:
@@ -51,7 +51,7 @@ class LearnedBloomFilter:
                     break
             data = json.loads(msg.value().decode('utf-8'))
             key = msg.key()
-            self.filter.insert(key)
+            self.filter.insert(int(key))
             # TODO call to DB for insert
 
     """
