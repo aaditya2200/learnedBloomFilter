@@ -1,34 +1,26 @@
-"""
-@author Aaditya
-@version 0.1
-@since 17-03-2024
-NOT FOR USE, THIS IS ONLY TEST CODE
-"""
-from kafka import KafkaConsumer, KafkaProducer
-import random
-import string
-import sys
-from json import dumps
-
-def generate_random_string(length):
-    letters = string.ascii_letters
-    return ''.join(random.choice(letters) for _ in range(length))
+from confluent_kafka import Producer
+import json
 
 
-# Bootstrap server configuration.
-bootstrap_servers = ['localhost:9092']
 
-# Topic Name
-topic_name = 'quickstart-events'
+if __name__ == '__main__':
+    # Create Producer instance
+    producer = Producer({'bootstrap.servers': 'localhost:9092'})
 
-# producer setup
-kafka_producer = KafkaProducer(bootstrap_servers=bootstrap_servers, value_serializer=lambda x: dumps(x).encode('utf-8'))
-# send data to the topic
-try:
-    while True:
-        ack = kafka_producer.send(topic_name, generate_random_string(10).encode('utf-8'))
-        metadata = ack.get()
-        print(metadata.topic, metadata.partition)
-except KeyboardInterrupt:
-    sys.exit()
+    # Define the topic to which you want to produce messages
+    topic = 'stream-test'
 
+    # Define your JSON data
+    data = {
+        "key": 12345,
+        "value": "example_value"
+    }
+
+    # Serialize the data to JSON
+    json_data = json.dumps(data)
+
+    # Produce the message with a key
+    producer.produce(topic, key=str(data["key"]), value=json_data)
+
+    # Flush messages to ensure they are sent
+    producer.flush()
