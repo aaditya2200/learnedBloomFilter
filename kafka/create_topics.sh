@@ -4,4 +4,4 @@
 sleep 30
 
 # Create Kafka topics
-kafka-topics --bootstrap-server kafka:9092 --topic first_topic --create --partitions 1 --replication-factor 1
+kafka-topics --bootstrap-server kafka:9092 --topic ecommerce_activity --create --partitions 1 --replication-factor 1
