@@ -20,15 +20,20 @@ def base():
 def insert():
     data = request.get_json()
     lbf.insert(data.key)
-    # TODO: call to insert into DB
     return 201
 
 
 @app.route("/query/<key>")
 def query(key):
+    found = False
     result = lbf.query(int(key))
+    if result:
+        collection = lbf.collection.find_one({'key': key})
+        if collection:
+            found = True
     json_result = {
-        "Present": result
+        "Present": result,
+        "found_in_db": False
     }
     return jsonify(json_result), 200
 
