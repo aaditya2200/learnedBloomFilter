@@ -1,4 +1,4 @@
-absl-py==2.1.0
+absl-py==0.15.0
 astunparse==1.6.3
 bitarray==2.9.2
 blinker==1.7.0
