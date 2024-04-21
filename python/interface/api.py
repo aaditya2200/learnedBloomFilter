@@ -6,6 +6,11 @@ This file contains the public API for the learned bloom filter. It can be used s
 larger test module.
 FOR EXTERNAL USE
 """
+import sys
+import os
+
+# Add the parent directory of 'Filter' to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from confluent_kafka import KafkaError
 
 from Filter import BloomFilter
