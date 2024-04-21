@@ -11,6 +11,7 @@ from confluent_kafka import KafkaError
 from Filter import BloomFilter
 from enum import Enum
 import json
+import pymongo
 
 
 class MODE(Enum):
@@ -30,6 +31,11 @@ class LearnedBloomFilter:
     def __init__(self, mode, optargs):
         self.mode = mode
         self.filter = BloomFilter.create_filter_with_defaults()
+        self.client = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.db_name = "stream_db"
+        self.db = self.client[self.db_name]
+        self.collection_name = "producer_collection"
+        self.collection = self.db[self.collection_name]
         if mode == MODE.STREAM:
             self.optargs = optargs
             self.consumer = BloomFilter.create_filter_with_stream_config(self.filter, optargs)
@@ -52,7 +58,7 @@ class LearnedBloomFilter:
             data = json.loads(msg.value().decode('utf-8'))
             key = msg.key()
             self.filter.insert(int(key))
-            # TODO call to DB for insert
+            self.collection.insert_one(data)
 
     """
     Only to be used in REST mode
