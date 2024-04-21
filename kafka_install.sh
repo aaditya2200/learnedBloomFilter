@@ -11,3 +11,4 @@ cd /opt/kafka
 ./gradlew jar -PscalaVersion=2.13.12
 zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties
 kafka-server-start.sh -daemon /opt/kafka/config/server.properties
+cd ~
