@@ -16,6 +16,9 @@ class Brain:
             Dense(32, activation='relu', name='hidden_layer'),
             Dense(1, activation='sigmoid', name='output_layer')
         ])
+        self.optimizer = 'adam'
+        self.loss = 'binary_crossentropy'
+        self.neural_network.compile(self.optimizer, self.loss)
 
     def train_batch(self, x_train, y_train):
         self.neural_network.train_on_batch(x_train, y_train)
