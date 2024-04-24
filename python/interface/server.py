@@ -7,6 +7,7 @@ USE IN REST MODE ONLY
 """
 from flask import Flask, request, jsonify
 from api import LearnedBloomFilter, MODE
+from Attacker import attacker
 
 app = Flask(__name__)
 
@@ -19,23 +20,15 @@ def base():
 @app.route("/insert", methods=["POST"])
 def insert():
     data = request.get_json()
-    lbf.insert(data.key)
-    return 201
+    lbf.insert(int(data['key']))
+    return '', 201
 
 
 @app.route("/query/<key>")
 def query(key):
     found = False
     result = lbf.query(int(key))
-    if result:
-        collection = lbf.collection.find_one({'key': key})
-        if collection:
-            found = True
-    json_result = {
-        "Present": result,
-        "found_in_db": False
-    }
-    return jsonify(json_result), 200
+    return result, 200
 
 
 @app.route("/consume")
@@ -43,6 +36,12 @@ def consume():
     lbf.consume()
 
 
+@app.route("/attack")
+def p_attack():
+    att.attack()
+
+
 if __name__ == "__main__":
     lbf = LearnedBloomFilter(MODE.STREAM, ['localhost:9092', 'stream-test'])
+    att = attacker.Attacker()
     app.run(debug=True)

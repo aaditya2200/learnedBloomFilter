@@ -11,6 +11,7 @@ import os
 
 # Add the parent directory of 'Filter' to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from flask import jsonify
 from confluent_kafka import KafkaError
 
 from Filter import BloomFilter
@@ -22,6 +23,7 @@ import pymongo
 class MODE(Enum):
     REST = 0
     STREAM = 1
+    DEBUG = 2
 
 
 class LearnedBloomFilter:
@@ -33,7 +35,7 @@ class LearnedBloomFilter:
     :param optargs: a list of strings, the first value is the address of the bootstrap server, second is kafka topic name
     """
 
-    def __init__(self, mode, optargs):
+    def __init__(self, mode, optargs=None):
         self.mode = mode
         self.filter = BloomFilter.create_filter_with_defaults()
         self.client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -70,9 +72,9 @@ class LearnedBloomFilter:
     """
 
     def insert(self, key):
-        if self.mode != MODE.REST:
-            raise ValueError("Invalid mode. Expected MODE.REST.")
         self.filter.insert(key)
+        doc = {'key': key}
+        self.collection.insert_one(doc)
         return
 
     """
@@ -80,6 +82,17 @@ class LearnedBloomFilter:
     """
 
     def query(self, key):
-        if self.mode != MODE.REST:
-            raise ValueError("Invalid mode. Expected MODE.REST.")
-        return self.filter.query(key)
+        found = False
+        result = self.filter.query_nn(key)
+        if result:
+            collection = self.collection.find_one({'key': key})
+            if collection:
+                found = True
+        json_result = {
+            "Present": result,
+            "found_in_db": found
+        }
+        # retrain the nn here if found = false
+        if not found:
+            self.filter.train_one(key)
+        return jsonify(json_result)
