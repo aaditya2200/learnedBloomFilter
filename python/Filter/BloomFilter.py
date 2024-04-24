@@ -30,7 +30,6 @@ class BloomFilter:
         self.number_of_bits = int(-1 * (num_entries * math.log(false_pos_rate)) / pow(math.log(2.0), 2))
         self.hash_func_list = hash_func_list
         self.bloom = array('i', [0] * self.number_of_bits)
-        self.brain = brain.Brain()
         self.neural_network = model = Sequential([
             Dense(64, activation='relu', input_shape=(64,), name='input_layer'),
             Dense(32, activation='relu', name='hidden_layer'),
@@ -48,12 +47,16 @@ class BloomFilter:
         # Now, lets train our model also.
 
         X_train, y_train = np.array([integer_to_binary(key)]), np.array([[1]])
-        self.neural_network.train_batch(X_train, y_train)
+        self.neural_network.train_on_batch(X_train, y_train)
 
     def train(self, nums):
         for item in nums:
             x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
-            self.brain.neural_network(x_train, y_train)
+            self.neural_network(x_train, y_train)
+
+    def train_one(self, item):
+        x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
+        self.neural_network(x_train, y_train)
 
     def query(self, key):
         for func in self.hash_func_list:

@@ -1,8 +1,8 @@
 from python.Filter.BloomFilter import BloomFilter
 from python.Hashes import hash
+from interface import api
 hash_lib = hash.Hash()
-bf = BloomFilter(4, 1000, 0.1, [hash_lib.division_hash, hash_lib.sax_hash, hash_lib.multiplication_hash,
-                                            hash_lib.bitwise_xor_hash])
+lbf = api.LearnedBloomFilter(api.MODE.DEBUG)
 even_numbers = []
 odd_numbers = []
 hash_lib = hash.Hash()
@@ -14,10 +14,10 @@ for num in range(1000):
         odd_numbers.append(num)
 
 for item in odd_numbers:
-    bf.insert(item)
+    lbf.insert(item)
 
 for num in even_numbers:
-    if bf.query(num) and bf.query_nn(num):
+    if lbf.query(num):
         print('Found FP')
 
 
