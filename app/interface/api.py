@@ -6,11 +6,12 @@ This file contains the public API for the learned bloom filter. It can be used s
 larger test module.
 FOR EXTERNAL USE
 """
+
 import sys
 import os
 
 # Add the parent directory of 'Filter' to the Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from flask import jsonify
 from confluent_kafka import KafkaError
 
@@ -45,27 +46,41 @@ class LearnedBloomFilter:
         self.collection = self.db[self.collection_name]
         if mode == MODE.STREAM:
             self.optargs = optargs
-            self.consumer = BloomFilter.create_filter_with_stream_config(self.filter, optargs)
+            self.consumer = BloomFilter.create_filter_with_stream_config(
+                self.filter, optargs
+            )
         return
 
     def consume(self):
-        self.consumer.subscribe([self.optargs[1]])
-        while True:
-            msg = self.consumer.poll(1.0)
-            if msg is None:
-                continue
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition
+        try:
+            self.consumer.subscribe([self.optargs[1]])  # subscribe to kafka topic
+            while True:
+                msg = self.consumer.poll(
+                    1.0
+                )  # Poll for messages with a timeout of 1 second
+                if msg is None:
+                    continue
+                if msg.error():
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+                        # End of partition, consumer has reached the end
+                        break
+                    else:
+                        # Error
+                        print(msg.error())
+                        break
+                data = json.loads(msg.value().decode("utf-8"))
+                key = msg.key()
+
+                if key == -1:
+                    explicit_stop = True  # Producer signaled stop
                     break
-                else:
-                    # Error
-                    print(msg.error())
-                    break
-            data = json.loads(msg.value().decode('utf-8'))
-            key = msg.key()
-            self.filter.insert(int(key))
-            self.collection.insert_one(data)
+
+                self.filter.insert(int(key))  # insert the key into the filter
+                self.collection.insert_one(data)  # insert data into mongodb collection
+            return True, "explicit stop" if explicit_stop else "partition eof"
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return False, "exception"  # Return False if an exception occurs
 
     """
     Only to be used in REST mode
@@ -73,7 +88,7 @@ class LearnedBloomFilter:
 
     def insert(self, key):
         self.filter.insert(key)
-        doc = {'key': key}
+        doc = {"key": key}
         self.collection.insert_one(doc)
         return
 
@@ -83,16 +98,13 @@ class LearnedBloomFilter:
 
     def query(self, key):
         found = False
-        result = self.filter.query_nn(key)
+        result = self.filter.query_nn(key)  # filter the query for key
         if result:
-            collection = self.collection.find_one({'key': key})
+            collection = self.collection.find_one({"key": key})
             if collection:
                 found = True
-        json_result = {
-            "Present": result,
-            "found_in_db": found
-        }
+        json_result = {"Present": result, "found_in_db": found}
         # retrain the nn here if found = false
-        if not found:
+        if result and not found:
             self.filter.train_one(key)
         return jsonify(json_result)
