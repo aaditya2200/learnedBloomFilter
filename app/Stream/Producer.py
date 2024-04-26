@@ -45,7 +45,7 @@ locations = [
     "Colorado",
 ]
 
-config = {"bootstrap.servers": "127.0.0.1:9092", "client.id": "my-ecommerce-app"}
+config = {"bootstrap.servers": "kafka:9092", "client.id": "my-ecommerce-app"}
 
 # Create Producer instance
 producer = Producer(config)

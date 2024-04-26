@@ -10,7 +10,7 @@ import sys
 
 # Consumer setup.
 config = {
-    "bootstrap.servers": "127.0.0.1:9092",
+    "bootstrap.servers": "0.0.0.0:9092",
     "group.id": "my_consumer_group",
     "auto.offset.reset": "earliest",
 }

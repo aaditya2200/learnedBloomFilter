@@ -11,6 +11,12 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Copy the create_topic.sh script into the container
+COPY create_topic.sh /usr/bin/create_topic.sh
+
+# Make sure the script is executable
+RUN chmod +x /usr/bin/create_topic.sh
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 

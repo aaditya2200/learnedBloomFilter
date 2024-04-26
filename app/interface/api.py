@@ -39,7 +39,7 @@ class LearnedBloomFilter:
     def __init__(self, mode, optargs=None):
         self.mode = mode
         self.filter = BloomFilter.create_filter_with_defaults()
-        self.client = pymongo.MongoClient("mongodb://localhost:27017/")
+        self.client = pymongo.MongoClient("mongodb://mongodb:27017/")
         self.db_name = "stream_db"
         self.db = self.client[self.db_name]
         self.collection_name = "producer_collection"

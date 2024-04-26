@@ -68,5 +68,7 @@ def p_attack():
 topic = "ecommerce_activity"
 
 if __name__ == "__main__":
-    lbf = LearnedBloomFilter(MODE.STREAM, ["127.0.0.1:9092", topic])
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    print("Learned Bloom Filter Server:")
+    lbf = LearnedBloomFilter(MODE.STREAM, ["kafka:9092", topic])
+    print("Starting server on port 5001...")
+    app.run(port=5001, debug=True)
