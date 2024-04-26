@@ -1,5 +1,5 @@
 """
-@author Aaditya
+@author Aaditya and Sam Blesswin
 @version 0.1
 @since 17-03-2024
 Bloom filter internal code. DO NOT USE DIRECTLY. CONSUME ONLY VIA api.py

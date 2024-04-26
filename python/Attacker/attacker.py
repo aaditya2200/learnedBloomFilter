@@ -1,5 +1,5 @@
 """
-@author Aaditya
+@author Aaditya and Sam Blesswin
 """
 # This script is the attacker script. It will probe the filter until it identifies an FP key. Once it does,
 # it will keep querying with the same key.

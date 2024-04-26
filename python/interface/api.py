@@ -1,5 +1,5 @@
 """
-@author Aaditya
+@author Aaditya and Sam Blesswin
 @version 0.1
 @since 17-03-2024
 This file contains the public API for the learned bloom filter. It can be used standalone or as part of the
