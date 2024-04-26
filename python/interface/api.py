@@ -8,7 +8,7 @@ FOR EXTERNAL USE
 """
 import sys
 import os
-
+import threading
 # Add the parent directory of 'Filter' to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import jsonify
@@ -36,6 +36,7 @@ class LearnedBloomFilter:
     """
 
     def __init__(self, mode, optargs=None):
+        self.lock = threading.Lock()
         self.mode = mode
         self.filter = BloomFilter.create_filter_with_defaults()
         self.client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -64,17 +65,19 @@ class LearnedBloomFilter:
                     break
             data = json.loads(msg.value().decode('utf-8'))
             key = msg.key()
-            self.filter.insert(int(key))
-            self.collection.insert_one(data)
+            with self.lock:
+                self.filter.insert(int(key))
+                self.collection.insert_one(data)
 
     """
     Only to be used in REST mode
     """
 
     def insert(self, key):
-        self.filter.insert(key)
-        doc = {'key': key}
-        self.collection.insert_one(doc)
+        with self.lock:
+            self.filter.insert(key)
+            doc = {'key': key}
+            self.collection.insert_one(doc)
         return
 
     """
@@ -82,17 +85,18 @@ class LearnedBloomFilter:
     """
 
     def query(self, key):
-        found = False
-        result = self.filter.query_nn(key)
-        if result:
-            collection = self.collection.find_one({'key': key})
-            if collection:
-                found = True
-        json_result = {
-            "Present": result,
-            "found_in_db": found
-        }
-        # retrain the nn here if found = false
-        if not found:
-            self.filter.train_one(key)
-        return jsonify(json_result)
+        with self.lock:
+            found = False
+            result = self.filter.query_nn(key)
+            if result:
+                collection = self.collection.find_one({'key': key})
+                if collection:
+                    found = True
+            json_result = {
+                "Present": result,
+                "found_in_db": found
+            }
+            # retrain the nn here if found = false
+            if not found:
+                self.filter.train_one(key)
+            return jsonify(json_result)

@@ -44,4 +44,4 @@ def p_attack():
 if __name__ == "__main__":
     lbf = LearnedBloomFilter(MODE.STREAM, ['localhost:9092', 'stream-test'])
     att = attacker.Attacker()
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
