@@ -1,3 +1,7 @@
+"""
+@author Sam Blesswin
+"""
+
 from confluent_kafka import Producer
 import json
 

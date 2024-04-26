@@ -1,5 +1,5 @@
 """
-@author Aaditya
+@author Sam Blesswin
 @version 0.1
 @since 17-03-2024
 This file maps the learned bloom filter APIs to REST API endpoints.
