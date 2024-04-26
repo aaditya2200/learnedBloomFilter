@@ -9,11 +9,19 @@ import math
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Embedding, Conv1D, MaxPooling1D, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
+<<<<<<< HEAD
+=======
+from keras import Sequential
+from keras.src.layers import Dense
+>>>>>>> master
 import numpy as np
 from Hashes import hash
 from kafka import KafkaConsumer
 from confluent_kafka import Consumer, KafkaError
+<<<<<<< HEAD
 from Brain import brain
+=======
+>>>>>>> master
 
 
 def integer_to_binary(id):
@@ -29,7 +37,18 @@ class BloomFilter:
         self.number_of_bits = int(-1 * (num_entries * math.log(false_pos_rate)) / pow(math.log(2.0), 2))
         self.hash_func_list = hash_func_list
         self.bloom = array('i', [0] * self.number_of_bits)
+<<<<<<< HEAD
         self.brain = brain.Brain()
+=======
+        self.neural_network = model = Sequential([
+            Dense(64, activation='relu', input_shape=(64,), name='input_layer'),
+            Dense(32, activation='relu', name='hidden_layer'),
+            Dense(1, activation='sigmoid', name='output_layer')
+        ])
+        self.optimizer = 'adam'
+        self.loss = 'binary_crossentropy'
+        self.neural_network.compile(self.optimizer, self.loss, metrics=['accuracy'])
+>>>>>>> master
 
 
     def insert(self, key):
@@ -39,12 +58,24 @@ class BloomFilter:
         # Now, lets train our model also.
 
         X_train, y_train = np.array([integer_to_binary(key)]), np.array([[1]])
+<<<<<<< HEAD
         self.brain.train_batch(X_train, y_train)
+=======
+        self.neural_network.train_on_batch(X_train, y_train)
+>>>>>>> master
 
     def train(self, nums):
         for item in nums:
             x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
+<<<<<<< HEAD
             self.brain.train_batch(x_train, y_train)
+=======
+            self.neural_network(x_train, y_train)
+
+    def train_one(self, item):
+        x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
+        self.neural_network(x_train, y_train)
+>>>>>>> master
 
     def query(self, key):
         for func in self.hash_func_list:
@@ -54,7 +85,11 @@ class BloomFilter:
         return True
 
     def query_nn(self, key):
+<<<<<<< HEAD
         prediction = self.brain.get_prediction(np.array([integer_to_binary(key)]))
+=======
+        prediction = self.neural_network.predict(np.array([integer_to_binary(key)]))
+>>>>>>> master
         if prediction > 0.9:
             return True
         else:
