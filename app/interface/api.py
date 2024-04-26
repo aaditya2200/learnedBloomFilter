@@ -9,6 +9,7 @@ FOR EXTERNAL USE
 
 import sys
 import os
+import threading
 
 # Add the parent directory of 'Filter' to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -37,6 +38,7 @@ class LearnedBloomFilter:
     """
 
     def __init__(self, mode, optargs=None):
+        self.lock = threading.Lock()
         self.mode = mode
         self.filter = BloomFilter.create_filter_with_defaults()
         self.client = pymongo.MongoClient("mongodb://mongodb:27017/")
@@ -74,9 +76,9 @@ class LearnedBloomFilter:
                 if key == -1:
                     explicit_stop = True  # Producer signaled stop
                     break
-
-                self.filter.insert(int(key))  # insert the key into the filter
-                self.collection.insert_one(data)  # insert data into mongodb collection
+                with self.lock:
+                    self.filter.insert(int(key))  # insert the key into the filter
+                    self.collection.insert_one(data)  # insert data into mongodb collection
             return True, "explicit stop" if explicit_stop else "partition eof"
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -87,9 +89,10 @@ class LearnedBloomFilter:
     """
 
     def insert(self, key):
-        self.filter.insert(key)
-        doc = {"key": key}
-        self.collection.insert_one(doc)
+        with self.lock:
+            self.filter.insert(key)
+            doc = {"key": key}
+            self.collection.insert_one(doc)
         return
 
     """
@@ -98,13 +101,14 @@ class LearnedBloomFilter:
 
     def query(self, key):
         found = False
-        result = self.filter.query_nn(key)  # filter the query for key
-        if result:
-            collection = self.collection.find_one({"key": key})
-            if collection:
-                found = True
-        json_result = {"Present": result, "found_in_db": found}
-        # retrain the nn here if found = false
-        if result and not found:
-            self.filter.train_one(key)
-        return jsonify(json_result)
+        with self.lock:
+            result = self.filter.query_nn(key)  # filter the query for key
+            if result:
+                collection = self.collection.find_one({"key": key})
+                if collection:
+                    found = True
+            json_result = {"Present": result, "found_in_db": found}
+            # retrain the nn here if found = false
+            if result and not found:
+                self.filter.train_one(key)
+            return jsonify(json_result)

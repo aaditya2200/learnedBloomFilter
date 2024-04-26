@@ -71,4 +71,4 @@ if __name__ == "__main__":
     print("Learned Bloom Filter Server:")
     lbf = LearnedBloomFilter(MODE.STREAM, ["kafka:9092", topic])
     print("Starting server on port 5001...")
-    app.run(port=5001, debug=True)
+    app.run(port=5001, debug=True, threaded=True)
