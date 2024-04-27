@@ -12,13 +12,10 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Make port 5001 available to the world outside this container
 EXPOSE 5001
 
-# Ensure the script is executable
-RUN chmod +x start_services.sh
-
-# Run start_services.sh when the container launches
-CMD ["./start_services.sh"]
+# Run server.py from the specified directory when the container launches
+CMD ["python3", "app/interface/server.py"]

@@ -88,6 +88,5 @@ def run():
     counter = 0
     while counter < 100:  # while true
         produce_message()
-        time.sleep(5)  # Send a message every 5 seconds
         counter += 1
     produce_end_message()

@@ -78,7 +78,9 @@ class LearnedBloomFilter:
                     break
                 with self.lock:
                     self.filter.insert(int(key))  # insert the key into the filter
-                    self.collection.insert_one(data)  # insert data into mongodb collection
+                    self.collection.insert_one(
+                        data
+                    )  # insert data into mongodb collection
             return True, "explicit stop" if explicit_stop else "partition eof"
         except Exception as e:
             print(f"An error occurred: {e}")
