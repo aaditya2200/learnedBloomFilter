@@ -54,6 +54,10 @@ producer = Producer(config)
 topic = "ecommerce_activity"
 
 
+def get_random_element(lst):
+    return random.choice(lst)
+
+
 def generate_activity():
     return {
         "userId": random.randint(0, 999999),
