@@ -21,7 +21,7 @@ footprint by just 0.2%. This code has the following components.
 ## Disclaimer
 This system is designed to run in docker end-to-end. However, we **strongly** recommend 
 that you run it on a system which has at least 32GiB of RAM. We have observed the docker containers
-crash in systems with low memory. Free of cost high performance cloud VMs can be found [here](cloudlab.us).
+crash in systems with low memory. Free of cost high performance cloud VMs can be found [here](https://www.cloudlab.us).
 
 ## How To Use
 All you have to do is run ```docker compose up --build```. Docker will then bring up Zookeper, Kafka, MongoDB, and then start the python
