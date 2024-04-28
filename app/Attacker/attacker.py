@@ -6,43 +6,75 @@
 # It will probe the filter until it identifies an False Positive (FP) key.
 # Once it does, it will keep querying with the same key.
 
-from interface import api
-import json
+import requests
+import numpy as np
 
 # from Hashes import hash
+
+base_url = "http://flaskapp:5001"
 
 
 class Attacker:
     def __init__(self):
+        self.false_positives_average_poll_list_lbf = []
+        self.false_positives_average_poll_list_bf = []
         return
 
-    def attack(self):
-        # hash_lib = hash.Hash()
-        # even_numbers = []
-        # odd_numbers = []
-        # # Generate even and odd numbers between 0 and 9999
-        # for num in range(1000):
-        #     if num % 2 == 0:
-        #         even_numbers.append(num)
-        #     else:
-        #         odd_numbers.append(num)
-
-        # # Create the filter
-        # lbf = api.LearnedBloomFilter(api.MODE.DEBUG)
-        # for item in odd_numbers:
-        #     lbf.insert(item)
-
-        # For simplicity, we are providing the filter the domain of the keys. Without this information,
-        # it is very time-consuming for the attacker to identify which key is a false positive.
-
-        counter = 0
+    def attack(self, limit):
+        self.false_positives_average_poll_list_lbf = [0] * int(limit)
+        counter = 1
+        index = 0
+        attempts = 0
         while True:
-            response = lbf.query(counter)
-            if response.json["Present"] and not response.json["found_in_db"]:
+            attempts += 1
+            if attempts > int(limit):
+                break
+            response = requests.get(f"{base_url}/query/{counter}")
+            if response.json()["Present"] and not response.json()["found_in_db"]:
                 while True:
-                    response = lbf.query(counter)
-                    if not response.json["Present"]:
+                    attempts += 1
+                    if attempts > int(limit):
                         break
+                    response = requests.get(f"{base_url}/query/{counter}")
+                    if not response.json()["Present"]:
+                        index += 1
+                        break
+                    self.false_positives_average_poll_list_lbf[index] += 1
                 # We have found a FP key. Keep querying with this key
             else:
                 counter += 1
+        print('')
+
+    def attack_normal(self, limit):
+        self.false_positives_average_poll_list_bf = [0] * int(limit)
+        counter = 1
+        index = 0
+        attempts = 0
+        while True:
+            attempts += 1
+            if attempts > int(limit):
+                break
+            response = requests.get(f"{base_url}/query-normal/{counter}")
+            if response.json()["Present"] and not response.json()["found_in_db"]:
+                while True:
+                    attempts += 1
+                    if attempts > int(limit):
+                        break
+                    response = requests.get(f"{base_url}/query-normal/{counter}")
+                    if not response.json()["Present"]:
+                        index += 1
+                        break
+                    self.false_positives_average_poll_list_bf[index] += 1
+                # We have found a FP key. Keep querying with this key
+            else:
+                counter += 1
+        print('')
+
+    def report(self):
+        mean1 = max(self.false_positives_average_poll_list_lbf)
+        mean2 = max(self.false_positives_average_poll_list_bf)
+        memory = requests.get(f"{base_url}/mem")
+        # Plot the means on a bar graph
+        print('Mean attempts on the same key for learned broom filter {}'.format(mean1))
+        print('Mean attempts on the same key for bloom filter {}'.format(mean2))
+        print('Memory usage {}'.format(memory.json()['memory']))

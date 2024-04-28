@@ -33,10 +33,17 @@ def query(key):
     return result, 200
 
 
-@app.route("/produce")
-def produce():
+@app.route("/query-normal/<key>")
+def query_normal(key):
+    found = False
+    result = lbf.query_n(int(key))
+    return result, 200
+
+
+@app.route("/produce/<dist>/<limit>")
+def produce(dist, limit):
     try:
-        Producer.run()
+        Producer.run(dist, limit)
         return (
             jsonify(
                 {
@@ -59,16 +66,32 @@ def consume():
         return jsonify({"status": "error", "message": message}), 500
 
 
-@app.route("/attack")
-def p_attack():
-    att.attack()
+@app.route("/attack/<limit>")
+def p_attack(limit):
+    att.attack(limit)
+    return '', 200
+
+@app.route("/attack-normal/<limit>")
+def n_attack(limit):
+    att.attack_normal(limit)
+    return '', 200
+@app.route("/report")
+def report():
+    att.report()
+    return '', 200
+
+@app.route("/mem")
+def memory():
+    mem = lbf.get_mem()
+    return jsonify({"status": "success", "memory": mem}), 200
 
 
 # Define the topic to which you want to consume messages
-topic = "ecommerce_activity"
+topic = "ecommerce-activity"
 
 if __name__ == "__main__":
     print("Learned Bloom Filter Server:")
-    lbf = LearnedBloomFilter(MODE.STREAM, ["kafka:9092", topic])
+    lbf = LearnedBloomFilter(MODE.STREAM, 1000000, ["kafka:9092", topic])
+    att = attacker.Attacker()
     print("Starting server on port 5001...")
     app.run(host="0.0.0.0", port=5001, debug=True, threaded=True)

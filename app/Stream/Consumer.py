@@ -16,7 +16,7 @@ config = {
 }
 
 # Define the topic to which you want to consume messages
-topic = "ecommerce_activity"
+topic = "ecommerce-activity"
 
 consumer = Consumer(config)
 consumer.subscribe([topic])

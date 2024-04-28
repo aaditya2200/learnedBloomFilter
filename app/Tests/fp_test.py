@@ -4,8 +4,8 @@
 @since 17-03-2024
 NOT FOR USE, THIS IS ONLY TEST CODE
 """
-from python.Filter.BloomFilter import BloomFilter
-from python.Hashes import hash
+from app.Filter.BloomFilter import BloomFilter
+from app.Hashes import hash
 from interface import api
 hash_lib = hash.Hash()
 lbf = api.LearnedBloomFilter(api.MODE.DEBUG)

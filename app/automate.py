@@ -1,7 +1,7 @@
 import requests
 import time
 
-base_url = "http://127.0.0.1:5001"
+base_url = "http://flaskapp:5001"
 
 
 def call_produce():
@@ -33,12 +33,19 @@ def call_attack():
     response = requests.get(f"{base_url}/attack")
     print("Attack API Response:", response.json())
 
+def generate_report():
+    print('Generating report....')
+    """Create a bar chart and save it"""
+    response = requests.get(f"{base_url}/report")
+    print("Attack API Response:", response.json())
+
 
 def main():
     print("Starting API Automation...")
-    # call_produce()
-    # call_consume()
-    # call_attack()
+    call_produce()
+    call_consume()
+    call_attack()
+
     print("API Automation Completed.")
 
 

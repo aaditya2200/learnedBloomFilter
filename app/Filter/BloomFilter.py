@@ -76,7 +76,7 @@ class BloomFilter:
 
     def train_one(self, item):
         x_train, y_train = np.array([integer_to_binary(item)]), np.array([[0]])
-        self.neural_network(x_train, y_train)
+        self.neural_network.train_on_batch(x_train, y_train)
 
     def query(self, key):
         for func in self.hash_func_list:
@@ -93,8 +93,8 @@ class BloomFilter:
             return self.query(key)
 
 
-def create_filter_with_defaults():
-    bf = BloomFilter(4, 1000, 0.1, hash.Hash().get_default_hash_spec())
+def create_filter_with_defaults(limit):
+    bf = BloomFilter(4, limit, 0.1, hash.Hash().get_default_hash_spec())
     return bf
 
 
@@ -106,6 +106,7 @@ def create_filter_with_stream_config(bf, optargs):
         "bootstrap.servers": bootstrap_server_name,
         "auto.offset.reset": "earliest",
         "group.id": "test",
+        'max.poll.interval.ms': 600000
     }
     consumer = Consumer(bf.kafka_cfg)
     return consumer

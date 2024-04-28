@@ -27,7 +27,7 @@ services:
     depends_on:
       - kafka
     command: >
-      /bin/bash -c " sleep 10; kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic ecommerce_activity; "
+      /bin/bash -c " sleep 10; kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic ecommerce-activity; "
     restart: no
 
   mongodb:
