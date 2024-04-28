@@ -1,0 +1,49 @@
+version: '3'
+services:
+  zookeeper:
+    image: zookeeper:3.7.0
+    ports:
+      - "2181:2181"
+    restart: no
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+    restart: no
+
+  kafka-setup:
+    image: wurstmeister/kafka:latest
+    depends_on:
+      - kafka
+    command: >
+      /bin/bash -c " sleep 10; kafka-topics.sh --create --if-not-exists --bootstrap-server kafka:9092 --replication-factor 1 --partitions 1 --topic ecommerce-activity; "
+    restart: no
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: no
+
+  flaskapp:
+    build: .
+    ports:
+      - "5001:5001"
+    depends_on:
+      - kafka
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    restart: no

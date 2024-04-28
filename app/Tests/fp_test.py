@@ -1,5 +1,11 @@
-from python.Filter.BloomFilter import BloomFilter
-from python.Hashes import hash
+"""
+@author Aaditya and Sam Blesswin
+@version 0.1
+@since 17-03-2024
+NOT FOR USE, THIS IS ONLY TEST CODE
+"""
+from app.Filter.BloomFilter import BloomFilter
+from app.Hashes import hash
 from interface import api
 hash_lib = hash.Hash()
 lbf = api.LearnedBloomFilter(api.MODE.DEBUG)
