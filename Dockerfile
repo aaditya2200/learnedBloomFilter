@@ -18,4 +18,4 @@ RUN pip install -r requirements.txt
 EXPOSE 5001
 
 # Run server.py from the specified directory when the container launches
-CMD ["sh", "/shell/master_script.sh"]
+CMD ["python3", "app/interface/server.py"]
