@@ -61,6 +61,11 @@ Make sure all related services (like your Flask server and Kafka) are up and run
 
 The shell script does the following, the producer and consumer will be brought up, and this will pump data into the system. We have configured the system to only run with 1000 records. This is a small number, because for bigger workloads, the time taken for the test can range from a few minutes to an hour. Once all the data is pushed, the attacker script kicks in. Once the attack is finished, we report the maximum number of query for a false positive key from both the learned broom filter and a regular bloom filter, along with memory usage in the format `[neural_network_memory, bit_array_memory]`.
 
+There are two data distributions for the producer. ```prime``` and ```mix```. The producer is set to ```prime``` by default, but if you want to change it, you can replace the word '''prime''' with '''mix''' in the following URL.
+```
+curl --location 'http://127.0.0.1:5001/produce/prime/1000'
+```
+This URL can be found in ```master_script.sh```.
 ## Api Documentation
 
 Here's the API documentation for the five endpoints described in your code, which correspond to various functionalities related to the bloom and learned broom filters:
