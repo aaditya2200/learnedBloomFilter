@@ -78,4 +78,8 @@ class Attacker:
         print('Mean attempts on the same key for learned broom filter {}'.format(mean1))
         print('Mean attempts on the same key for bloom filter {}'.format(mean2))
         print('Memory usage {}'.format(memory.json()['memory']))
-        return (mean1, mean2, memory.json()['memory'])
+        return {
+            'learned_filter': mean1,
+            'bloom_filter': mean2,
+            'memory_usage': memory.json()['memory']
+        }
