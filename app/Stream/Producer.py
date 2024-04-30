@@ -10,7 +10,7 @@ from datetime import datetime
 import random
 import time
 
-key_distributions = ['random', 'gaussian', 'binomial', 'poisson']
+key_distributions = ["random", "gaussian", "binomial", "poisson"]
 
 activity_types = ["view", "click", "purchase"]
 categories = [
@@ -47,13 +47,14 @@ locations = [
     "Colorado",
 ]
 
-config = {"bootstrap.servers": "localhost:9092", "client.id": "my-ecommerce-app"}
+config = {"bootstrap.servers": "kafka:9092", "client.id": "my-ecommerce-app"}
 
 # Create Producer instance
 producer = Producer(config)
 
 # Define the topic to which you want to produce messages
 topic = "ecommerce-activity"
+
 
 def generate_prime():
     yield 2  # 2 is the first prime number
@@ -68,6 +69,7 @@ def generate_prime():
                 sieve.setdefault(num + p, []).append(p)
             del sieve[num]  # Remove the prime from the sieve
         num += 2  # Check only odd numbers (even numbers greater than 2 are not prime)
+
 
 def generate_mix():
     yield 2
@@ -86,8 +88,8 @@ def generate_mix():
             del sieve[num]
         num += 2  # Check only odd numbers (even numbers greater than 2 are not prime)
 
-generated_numbers = []
 
+generated_numbers = []
 
 
 def get_random_element(lst):
@@ -95,12 +97,12 @@ def get_random_element(lst):
 
 
 def generate_activity(distribution, prime_gen, mix_gen, limit):
-    if distribution == 'mix':
+    if distribution == "mix":
         user_id = next(mix_gen)
-    elif distribution == 'prime':
+    elif distribution == "prime":
         user_id = next(prime_gen)
     else:
-        user_id  = random.choice(range(1, int(limit), 2))
+        user_id = random.choice(range(1, int(limit), 2))
     return {
         "userId": user_id,
         "activityType": get_random_element(activity_types),
@@ -116,7 +118,9 @@ def generate_activity(distribution, prime_gen, mix_gen, limit):
 def produce_message(distribution, prime_gen, mix_gen, limit):
     try:
         message = generate_activity(distribution, prime_gen, mix_gen, limit)
-        producer.produce(topic, key=str(message["userId"]).encode('utf-8'), value=json.dumps(message))
+        producer.produce(
+            topic, key=str(message["userId"]).encode("utf-8"), value=json.dumps(message)
+        )
         producer.flush()
     except Exception as e:
         print(f"Failed to send message: {e}")
@@ -124,7 +128,9 @@ def produce_message(distribution, prime_gen, mix_gen, limit):
 
 def produce_end_message():
     try:
-        producer.produce(topic, key=str(-1).encode('utf-8'), value=json.dumps({"message": "end"}))
+        producer.produce(
+            topic, key=str(-1).encode("utf-8"), value=json.dumps({"message": "end"})
+        )
         producer.flush()
     except Exception as e:
         print(f"Failed to send message: {e}")
