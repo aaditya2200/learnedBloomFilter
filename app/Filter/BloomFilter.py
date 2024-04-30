@@ -87,7 +87,7 @@ class BloomFilter:
 
     def query_nn(self, key):
         prediction = self.neural_network.predict(np.array([integer_to_binary(key)]))
-        if prediction > 0.9:
+        if prediction > 0.999:
             return True
         else:
             return self.query(key)
