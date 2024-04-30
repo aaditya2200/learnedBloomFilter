@@ -77,8 +77,8 @@ def n_attack(limit):
     return '', 200
 @app.route("/report")
 def report():
-    att.report()
-    return '', 200
+    ret = att.report()
+    return jsonify(ret), 200
 
 @app.route("/mem")
 def memory():
