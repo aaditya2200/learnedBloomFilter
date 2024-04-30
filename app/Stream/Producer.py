@@ -47,7 +47,7 @@ locations = [
     "Colorado",
 ]
 
-config = {"bootstrap.servers": "kafka:9092", "client.id": "my-ecommerce-app"}
+config = {"bootstrap.servers": "localhost:9092", "client.id": "my-ecommerce-app"}
 
 # Create Producer instance
 producer = Producer(config)
@@ -86,10 +86,8 @@ def generate_mix():
             del sieve[num]
         num += 2  # Check only odd numbers (even numbers greater than 2 are not prime)
 
-def generate_odd(limit):
-    for i in range (1, limit):
-        if i % 2 != 0:
-            yield i
+generated_numbers = []
+
 
 
 def get_random_element(lst):
@@ -102,7 +100,7 @@ def generate_activity(distribution, prime_gen, mix_gen, limit):
     elif distribution == 'prime':
         user_id = next(prime_gen)
     else:
-        user_id = next(generate_odd(int(limit)))
+        user_id  = random.choice(range(1, int(limit), 2))
     return {
         "userId": user_id,
         "activityType": get_random_element(activity_types),
